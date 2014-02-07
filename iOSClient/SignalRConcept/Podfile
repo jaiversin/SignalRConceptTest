@@ -1,0 +1,4 @@
+platform :ios, '7.0'
+
+pod 'SignalR-ObjC'
+#pod 'JSMessagesViewController', '~> 3.4.4'
