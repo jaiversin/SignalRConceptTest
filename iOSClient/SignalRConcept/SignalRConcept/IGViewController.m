@@ -14,7 +14,6 @@
 @property (weak, nonatomic) IBOutlet UITextField *textMessageTextField;
 @property (weak, nonatomic) IBOutlet UITextView *messagesTextView;
 
-@property (nonatomic, strong) SRConnection *connection;
 @property (nonatomic, strong) SRHubConnection *hubConnection;
 @property (nonatomic, strong) SRHubProxy *chat;
 
@@ -26,26 +25,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    
-    __weak typeof (self) weakSelf = self;
-    
-//    self.chat = [self.connection createHubProxy:@"Chat"];
-//    
-//    [self.chat on:@"addNewMessageToPage" perform:self selector:@selector(addMessage:fromName:)];
-//    //[self.chat on:@"sendMeMessage" perform:self selector:@selector(sendMeMessage:message:)];
-//    
-//    self.connection.received = ^(NSString * data) {
-//        weakSelf.messagesTextView.text = [weakSelf.messagesTextView.text stringByAppendingString:weakSelf.messagesTextView.text];
-//    };
-//    self.connection.started =  ^{
-////        [self.connection send:@{}];
-//    };
-//    
-//    
-//    [self.connection setDelegate:self];
-//    
-//    [self.connection start];
-    
+   
     
 //    // Connect to the service
     self.hubConnection = [SRHubConnection connectionWithURL:@"http://10.60.6.27/chat/signalr/hubs"];
@@ -57,30 +37,26 @@
     [self.hubConnection start];
     
     
-//    NSString *server = @"http://10.60.6.27/chat/signalr/hubs/";
-////    server = [server stringByAppendingFormat:@"raw-connection"];
-//    
-//    self.connection = [SRConnection connectionWithURL:server];
-//    
-//    self.connection.delegate = self;
-//    [self.connection start];
-    
-    
-//    [self.connection.transport setDefaultHeader:@"Accept" value:@"application/json"];
-    
-//    self.connection.received = ^(NSString * data) {
-//        NSLog(data);
-//    };
-//    self.connection.started =  ^{
-//        [weakSelf.connection send:@"hello world"];
-//    };
-    
-    
-    
-    
-    
 }
 
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Lazy Inst
+-(SRHubConnection *)hubConnection
+{
+    if (!_hubConnection) {
+        _hubConnection = [SRHubConnection connectionWithURL:@"http://10.60.6.27/chat/signalr/hubs"];
+        
+    }
+    return _hubConnection;
+}
+
+#pragma mark - Receiving Methods
 - (void)fromName:(NSString *)name message:(NSString *)message {
     // Print the message when it comes in
     
@@ -91,57 +67,13 @@
 }
 
 
-//-(SRHubConnection *)connection
-//{
-//    if (!_connection) {
-//        _connection = [SRHubConnection connectionWithURL:@"http://10.60.6.27/chat/signalr/hubs"];
-//        
-//    }
-//    return _connection;
-//}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)addMessage:(id)message fromName:(id)name
-{
-    
-//    NSString *messageWithName = [NSString stringWithFormat:@"%@: %@ \n",name,message];
-//    
-//    self.messagesTextView.text = [self.messagesTextView.text stringByAppendingString:messageWithName];
-    
-    
-}
-
+#pragma mark - Sending Methods
 - (IBAction)sendMessage:(id)sender {
-    
-    
-    
-    [self.chat invoke:@"Send" withArgs:@[@"yo", self.textMessageTextField.text]];
-    NSString *messageWithName = [NSString stringWithFormat:@"%@: %@ \n",@"Yo",self.textMessageTextField.text];
-    
-//    self.messagesTextView.text = [self.messagesTextView.text stringByAppendingString:messageWithName];
-    
+    [self.chat invoke:@"Send" withArgs:@[@"Yo", self.textMessageTextField.text]];
     self.textMessageTextField.text = @"";
-    
-//    [self.connection send:@[@"yo", messageWithName] completionHandler:^(id response, NSError *error) {
-//        NSLog(response);
-//    }];
-    
-
 }
 
-
-- (void)sendMeMessage:(id)name message:(id)message
-{
-    NSString *messageWithName = [NSString stringWithFormat:@"%@: %@ \n",name,message];
-    
-    self.messagesTextView.text = [self.messagesTextView.text stringByAppendingString:messageWithName];
-}
-
+#pragma mark - SRConnectionDelegate Methods
 - (void)SRConnectionDidOpen:(SRConnection *)connection
 {
     
